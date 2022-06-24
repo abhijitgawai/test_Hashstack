@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 from brownie import (
-    Box,
+    # Box,
+    ContractA,
     TransparentUpgradeableProxy,
     ProxyAdmin,
     config,
@@ -13,7 +14,7 @@ from scripts.helpful_scripts import get_account, encode_function_data
 def main():
     account = get_account()
     print(f"Deploying to {network.show_active()}")
-    box = Box.deploy(
+    contractA = ContractA.deploy(
         {"from": account},
         publish_source=config["networks"][network.show_active()]["verify"],
     )
@@ -29,12 +30,12 @@ def main():
     box_encoded_initializer_function = encode_function_data()
     # box_encoded_initializer_function = encode_function_data(initializer=box.store, 1)
     proxy = TransparentUpgradeableProxy.deploy(
-        box.address,
+        contractA.address,
         # account.address,
         proxy_admin.address,
         box_encoded_initializer_function,
         {"from": account, "gas_limit": 1000000},
     )
     print(f"Proxy deployed to {proxy} ! You can now upgrade it to BoxV2!")
-    proxy_box = Contract.from_abi("Box", proxy.address, Box.abi)
+    proxy_box = Contract.from_abi("ContractA", proxy.address, ContractA.abi)
     print(f"Here is the initial value in the Box: {proxy_box.retrieve()}")
